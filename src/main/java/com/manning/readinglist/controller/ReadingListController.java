@@ -4,26 +4,40 @@ import com.manning.readinglist.dao.ReadingListRepository;
 import com.manning.readinglist.entity.Book;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
 
 @Api(tags="用户管理")
-@RestController
+@Controller
+@RequestMapping("/books")
 public class ReadingListController {
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
-    @Autowired
     private ReadingListRepository readingListRepository;
 
-    @ApiOperation("新增书本")
-    @GetMapping("/books/{id}")
-    public Book add(@ApiParam(value = "书本号") @PathVariable String id){
-        return  readingListRepository.findByReader("wo tou");
+
+    @ApiOperation("通过读者查询books")
+    @GetMapping("/{reader}")
+    public String get(@PathVariable(name = "reader") String reader, Model model){
+        List<Book> bookList = readingListRepository.findByReader(reader);
+        if(bookList!=null){
+            model.addAttribute("books",bookList);
+        }
+        return "readingList";
     }
 
+    @ApiOperation("添加book")
+    @PostMapping("/{reader}")
+    public String addToReadingList(@PathVariable(name = "reader") String reader,Book book){
+        book.setReader(reader);
+        readingListRepository.save(book);
+        return "redirect:/{reader}";
+    }
 }
