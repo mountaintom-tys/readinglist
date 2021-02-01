@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
-@Api(tags="用户管理")
+@Api(tags="书本管理")
 @Controller
 @RequestMapping("/books")
 public class ReadingListController {
@@ -38,6 +38,11 @@ public class ReadingListController {
     public String addToReadingList(@PathVariable(name = "reader") String reader,Book book){
         book.setReader(reader);
         readingListRepository.save(book);
-        return "redirect:/{reader}";
+        return "redirect:/books/{reader}";
+    }
+
+    public static void main(String[] args) {
+        String solrQuery = String.format("partNo:\"%s\"", 123l);
+        System.out.println(solrQuery);
     }
 }
